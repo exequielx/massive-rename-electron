@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Renombrador Masivo</title>
+  <style>
+    body {font-family: system-ui, sans-serif; margin:20px; background:#f0f2f5;}
+    .dropzone {border:2px dashed #6c63ff; border-radius:8px; padding:30px; text-align:center; color:#555; cursor:pointer;}
+    .dropzone.dragover {background:#e0e0ff;}
+    input, button {margin-top:8px; width:100%; padding:8px;}
+    pre {margin-top:12px; background:#fafafa; padding:8px; height:150px; overflow:auto;}
+  </style>
+</head>
+<body>
+  <h2>Renombrador Masivo de Series / Subtítulos</h2>
+  <div class="dropzone" id="dropzone">Arrastra aquí la carpeta raíz<br/>o haz click para buscar</div>
+  <input id="searchPrefix" placeholder='Prefijo de búsqueda (ej: "S01E")' />
+  <input id="extension" placeholder='Extensión (ej: .mkv, .srt) - opcional' />
+  <input id="finalPrefix" placeholder='Prefijo final (ej: "Serie_X_")' />
+  <input id="startIdx" type="number" placeholder='Índice inicial (default 1)' />
+  <input id="padLength" type="number" placeholder='Longitud del índice (default 3)' />
+  <label><input type="checkbox" id="dryRun" /> Modo simulación (sin cambios reales)</label>
+  <button id="runBtn">Ejecutar renombrado</button>
+  <pre id="log"></pre>
+  <script src="renderer.js"></script>
+</body>
+</html>
