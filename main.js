@@ -1,19 +1,25 @@
-// main.js
-const { app, BrowserWindow, ipcMain } = require('electron');
+// main.js — Electron main process
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const renameSeries = require('./rename_series');
 
+let mainWindow;
+
 function createWindow() {
-  const win = new BrowserWindow({
-    width: 620,
-    height: 460,
+  mainWindow = new BrowserWindow({
+    width: 700,
+    height: 720,
+    minWidth: 520,
+    minHeight: 600,
+    backgroundColor: '#0f0f1a',
+    titleBarStyle: 'default',
     webPreferences: {
-      preload: path.join(__dirname, 'renderer.js'),
+      preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
     },
   });
-  win.loadFile('index.html');
+  mainWindow.loadFile('index.html');
 }
 
 app.whenReady().then(() => {
@@ -27,12 +33,23 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-// Handle rename request from renderer
-ipcMain.handle('run-rename', async (event, options) => {
+// ─── IPC handlers ───
+
+// Open native FILE picker (multiple files)
+ipcMain.handle('open-file-dialog', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openFile', 'multiSelections'],
+    title: 'Seleccionar archivos a renombrar',
+  });
+  return result;
+});
+
+// Run rename
+ipcMain.handle('run-rename', async (_event, options) => {
   try {
-    await renameSeries(options);
-    return { success: true };
+    const logs = await renameSeries(options);
+    return { success: true, logs };
   } catch (err) {
-    return { success: false, error: err.message };
+    return { success: false, error: err.message, logs: [] };
   }
 });
