@@ -1,17 +1,18 @@
 // main.js — Electron main process
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const renameSeries = require('./rename_series');
 
 let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 700,
-    height: 720,
-    minWidth: 520,
-    minHeight: 600,
-    backgroundColor: '#0f0f1a',
+    width: 800,
+    height: 1000,
+    minWidth: 600,
+    minHeight: 650,
+    backgroundColor: '#121214',
     titleBarStyle: 'default',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -42,6 +43,21 @@ ipcMain.handle('open-file-dialog', async () => {
     title: 'Seleccionar archivos a renombrar',
   });
   return result;
+});
+
+// Validate files: filters out directories and returns valid file paths
+ipcMain.handle('validate-files', async (_event, filePaths) => {
+  const validFiles = [];
+  for (const fp of filePaths) {
+    try {
+      if (fs.existsSync(fp) && fs.lstatSync(fp).isFile()) {
+        validFiles.push(fp);
+      }
+    } catch (e) {
+      // Skip file on error
+    }
+  }
+  return validFiles;
 });
 
 // Run rename
